@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 
 import 'login.dart';
-import 'upload.dart';
+import '../mainfeature/upload.dart';
 
 class SuccessScreen extends StatelessWidget {
   const SuccessScreen({super.key});

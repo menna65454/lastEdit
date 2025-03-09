@@ -1,24 +1,24 @@
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
+
 import 'package:flutter/material.dart';
-import 'package:flutter/material.dart';
+import 'package:login2/setting/passwordmanger.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-
+import 'resetpass.dart';
 
 final supabase = Supabase.instance.client;
 
+class EmailVerification extends StatefulWidget {
+  final String email;
 
-class Phonemanger extends StatefulWidget {
-    final String phone;
-
-  
-   const Phonemanger({super.key, required this.phone});
+  const EmailVerification({super.key, required this.email});
 
   @override
-  State<Phonemanger> createState() => _PhonemangerState();
+  State<EmailVerification> createState() => _EmailVerificationState();
 }
 
-class _PhonemangerState extends State<Phonemanger> {
-   final List<TextEditingController> _codeControllers = List.generate(
+class _EmailVerificationState extends State<EmailVerification> {
+  final List<TextEditingController> _codeControllers = List.generate(
     6,
     (index) => TextEditingController(),
   );
@@ -38,11 +38,71 @@ class _PhonemangerState extends State<Phonemanger> {
     }
     super.dispose();
   }
-   
- 
+
+  Future<void> _verifyCode() async {
+    final code = _codeControllers.map((c) => c.text).join();
+    if (code.length != 6) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter the complete code')),
+      );
+      return;
+    }
+
+    try {
+      setState(() => _isLoading = true);
+
+      // تحقق من الكود عبر Supabase
+      final response = await supabase.auth.verifyOTP(
+        email: widget.email,
+        token: code,
+        type: OtpType.recovery, // نوع OTP المستخدم لاستعادة كلمة المرور
+      );
+
+      if (response.session != null) {
+        // إذا كان الكود صحيحًا، انتقل إلى شاشة إعادة تعيين كلمة المرور
+        if (mounted) {
+          Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => ResetPassword(email: widget.email),
+          ));
+          
+        }
+      } else {
+        throw Exception('Invalid code');
+      }
+    } catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Invalid verification code')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _resendCode() async {
+    try {
+      setState(() => _isLoading = true);
+      await supabase.auth.resetPasswordForEmail(widget.email);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('New code sent successfully')),
+        );
+      }
+    } catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Failed to resend code')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-   return Scaffold(
+    return Scaffold(
       body: SingleChildScrollView(
         child: Container(
           height: 812,
@@ -55,23 +115,7 @@ class _PhonemangerState extends State<Phonemanger> {
           ),
           child: Stack(
             children: [
-              ClipPath(
-                clipper: CustomClipPath(),
-                child: Container(
-                  height: 180,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topRight,
-                      end: Alignment.topLeft,
-                      colors: [
-                        Color(0xFF0A4627),
-                        Color(0xFF24744B),
-                        Color(0xFF3CAB72),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
+              
               SafeArea(
                 child: Padding(
                   padding: const EdgeInsets.all(20.0),
@@ -169,7 +213,7 @@ class _PhonemangerState extends State<Phonemanger> {
                             ),
                           ),
                           TextButton(
-                             onPressed:(){},// _isLoading ? null : _resendCode,
+                            onPressed: _isLoading ? null : _resendCode,
                             child: Text(
                               'Resend It',
                               style: TextStyle(
@@ -187,7 +231,7 @@ class _PhonemangerState extends State<Phonemanger> {
                         height: 50,
                         width: double.infinity,
                         child: OutlinedButton(
-                          onPressed: (){},//_isLoading ? null : _verifyCode,
+                          onPressed: _isLoading ? null : _verifyCode,
                           style: ButtonStyle(
                             backgroundColor:
                                 MaterialStateProperty.all(Colors.transparent),

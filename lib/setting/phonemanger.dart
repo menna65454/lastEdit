@@ -1,22 +1,19 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
-
+import 'package:flutter/material.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import 'resetpass.dart';
-
 final supabase = Supabase.instance.client;
 
-class EmailVerification extends StatefulWidget {
-  final String email;
+class Phonemanger extends StatefulWidget {
+  final String phone;
 
-  const EmailVerification({super.key, required this.email});
+  const Phonemanger({super.key, required this.phone});
 
   @override
-  State<EmailVerification> createState() => _EmailVerificationState();
+  State<Phonemanger> createState() => _PhonemangerState();
 }
 
-class _EmailVerificationState extends State<EmailVerification> {
+class _PhonemangerState extends State<Phonemanger> {
   final List<TextEditingController> _codeControllers = List.generate(
     6,
     (index) => TextEditingController(),
@@ -38,69 +35,21 @@ class _EmailVerificationState extends State<EmailVerification> {
     super.dispose();
   }
 
-  Future<void> _verifyCode() async {
-    final code = _codeControllers.map((c) => c.text).join();
-    if (code.length != 6) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter the complete code')),
-      );
-      return;
-    }
-
-    try {
-      setState(() => _isLoading = true);
-
-      // تحقق من الكود عبر Supabase
-      final response = await supabase.auth.verifyOTP(
-        email: widget.email,
-        token: code,
-        type: OtpType.recovery, // نوع OTP المستخدم لاستعادة كلمة المرور
-      );
-
-      if (response.session != null) {
-        // إذا كان الكود صحيحًا، انتقل إلى شاشة إعادة تعيين كلمة المرور
-        if (mounted) {
-          Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => ResetPassword(email: widget.email),
-          ));
-        }
-      } else {
-        throw Exception('Invalid code');
-      }
-    } catch (error) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Invalid verification code')),
-        );
-      }
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
-    }
-  }
-
-  Future<void> _resendCode() async {
-    try {
-      setState(() => _isLoading = true);
-      await supabase.auth.resetPasswordForEmail(widget.email);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('New code sent successfully')),
-        );
-      }
-    } catch (error) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to resend code')),
-        );
-      }
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text(
+          'Phone Manager',
+          style: TextStyle(
+            color: Color(0xFF0A4627),
+            fontSize: 28,
+            fontFamily: 'Inria Serif',
+            fontWeight: FontWeight.w700,
+            height: 1.50,
+          ),
+        ),
+      ),
       body: SingleChildScrollView(
         child: Container(
           height: 812,
@@ -113,51 +62,14 @@ class _EmailVerificationState extends State<EmailVerification> {
           ),
           child: Stack(
             children: [
-              ClipPath(
-                clipper: CustomClipPath(),
-                child: Container(
-                  height: 180,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topRight,
-                      end: Alignment.topLeft,
-                      colors: [
-                        Color(0xFF0A4627),
-                        Color(0xFF24744B),
-                        Color(0xFF3CAB72),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
               SafeArea(
                 child: Padding(
                   padding: const EdgeInsets.all(20.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const SizedBox(height: 180),
-                      Center(
-                        child: Text(
-                          'Email Verification',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 32,
-                            fontFamily: 'Inria Serif',
-                            fontWeight: FontWeight.w700,
-                            foreground: Paint()
-                              ..shader = LinearGradient(
-                                colors: [
-                                  Color(0xFF0A4627),
-                                  Color(0xFF24744B),
-                                ],
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                              ).createShader(Rect.fromLTRB(0, 0, 200, 70)),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 30),
+                      
                       Center(
                         child: Text(
                           'Get Your Code',
@@ -227,7 +139,8 @@ class _EmailVerificationState extends State<EmailVerification> {
                             ),
                           ),
                           TextButton(
-                            onPressed: _isLoading ? null : _resendCode,
+                            onPressed:
+                                () {}, // _isLoading ? null : _resendCode,
                             child: Text(
                               'Resend It',
                               style: TextStyle(
@@ -245,7 +158,7 @@ class _EmailVerificationState extends State<EmailVerification> {
                         height: 50,
                         width: double.infinity,
                         child: OutlinedButton(
-                          onPressed: _isLoading ? null : _verifyCode,
+                          onPressed: () {}, //_isLoading ? null : _verifyCode,
                           style: ButtonStyle(
                             backgroundColor:
                                 MaterialStateProperty.all(Colors.transparent),
@@ -307,27 +220,5 @@ class _EmailVerificationState extends State<EmailVerification> {
         ),
       ),
     );
-  }
-}
-
-class CustomClipPath extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    Path path = Path();
-    path.lineTo(0, size.height);
-    path.quadraticBezierTo(
-      size.width / 2,
-      size.height,
-      size.width,
-      size.height - 80,
-    );
-    path.lineTo(size.width, 0);
-    path.close();
-    return path;
-  }
-
-  @override
-  bool shouldReclip(covariant CustomClipper<Path> oldClipper) {
-    return true;
   }
 }

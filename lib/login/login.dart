@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 
 import 'forgetpass.dart';
 import 'signup_screen.dart';
-import 'upload.dart';
+import '../mainfeature/upload.dart';
 
 final supabase = Supabase.instance.client;
 
@@ -28,6 +28,7 @@ class _LoginScreenState extends State<LoginScreen> {
     _passwordController.dispose();
     super.dispose();
   }
+ 
 
   Future<void> _signInWithEmail() async {
     if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
@@ -67,44 +68,44 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  Future<void> _signInWithGoogle() async {
-    try {
-      setState(() => _isLoading = true);
-      await supabase.auth.signInWithOAuth(
-        Provider.google,
-        redirectTo: 'io.supabase.lipify://Upload_Page-callback/',
-      );
-    } catch (error) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to sign in with Google')),
-      );
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
-    }
-  }
+  // Future<void> _signInWithGoogle() async {
+  //   try {
+  //     setState(() => _isLoading = true);
+  //     await supabase.auth.signInWithOAuth(
+  //       Provider.google,
+  //       redirectTo: 'io.supabase.lipify://Upload_Page-callback/',
+  //     );
+  //   } catch (error) {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       const SnackBar(content: Text('Failed to sign in with Google')),
+  //     );
+  //   } finally {
+  //     if (mounted) setState(() => _isLoading = false);
+  //   }
+  // }
 
-  Future<void> _signInWithFacebook() async {
-  try {
-    setState(() => _isLoading = true);
-    await supabase.auth.signInWithOAuth(
-      Provider.facebook,
-      redirectTo: 'io.supabase.lipify://LoginScreen-callback/',
-    );
-    debugPrint("Facebook login started...");
-  } on AuthException catch (error) {
-    debugPrint("Facebook Auth Error: ${error.message}");
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Facebook Auth Error: ${error.message}')),
-    );
-  } catch (error) {
-    debugPrint("Unexpected error: $error");
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Unexpected error: $error')),
-    );
-  } finally {
-    if (mounted) setState(() => _isLoading = false);
-  }
-}
+//   Future<void> _signInWithFacebook() async {
+//   try {
+//     setState(() => _isLoading = true);
+//     await supabase.auth.signInWithOAuth(
+//       Provider.facebook,
+//       redirectTo: 'io.supabase.lipify://LoginScreen-callback/',
+//     );
+//     debugPrint("Facebook login started...");
+//   } on AuthException catch (error) {
+//     debugPrint("Facebook Auth Error: ${error.message}");
+//     ScaffoldMessenger.of(context).showSnackBar(
+//       SnackBar(content: Text('Facebook Auth Error: ${error.message}')),
+//     );
+//   } catch (error) {
+//     debugPrint("Unexpected error: $error");
+//     ScaffoldMessenger.of(context).showSnackBar(
+//       SnackBar(content: Text('Unexpected error: $error')),
+//     );
+//   } finally {
+//     if (mounted) setState(() => _isLoading = false);
+//   }
+// }
 
   
   @override
@@ -375,12 +376,12 @@ class _LoginScreenState extends State<LoginScreen> {
                         children: [
                           _socialLoginButton(
                             Icons.g_mobiledata,
-                            onPressed: _isLoading ? null : _signInWithGoogle,
+                            onPressed: (){}//_isLoading ? null : _signInWithGoogle,
                           ),
                           const SizedBox(width: 20),
                           _socialLoginButton(
                             Icons.facebook,
-                            onPressed: _isLoading ? null : _signInWithFacebook,
+                            onPressed:(){}// _isLoading ? null : _signInWithFacebook,
                           ),
                         ],
                       ),

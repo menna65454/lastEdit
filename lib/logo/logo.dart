@@ -1,6 +1,8 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, use_key_in_widget_constructors, library_private_types_in_public_api
 
 import 'package:flutter/material.dart';
+import 'package:login2/login/emailverification.dart';
+import '../mainfeature/upload.dart';
 import 'page1.dart'; // تأكد من استيراد الصفحة التالية
 
 class SplashScreen extends StatefulWidget {
@@ -13,11 +15,20 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
     Future.delayed(Duration(seconds: 3), () {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-            builder: (context) => Page1()), // استبدل بـ الصفحة التالية
-      );
+      final user = supabase.auth.currentUser;
+      if (user != null) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) => Upload_Page()), // استبدل بـ الصفحة التالية
+        );
+      } else {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) => Page1()), // استبدل بـ الصفحة التالية
+        );
+      }
     });
   }
 

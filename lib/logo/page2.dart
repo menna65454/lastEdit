@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 
-import 'login.dart';
+import '../login/login.dart';
 import 'page3.dart';
 
 class Page2 extends StatefulWidget {

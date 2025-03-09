@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'login.dart';
+import '../login/login.dart';
+import '../mainfeature/upload.dart';
 import 'page2.dart';
 
 class Page1 extends StatefulWidget {
@@ -8,9 +9,11 @@ class Page1 extends StatefulWidget {
 
   @override
   State<Page1> createState() => _Page1State();
+  
 }
 
 class _Page1State extends State<Page1> {
+  
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;

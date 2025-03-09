@@ -1,9 +1,13 @@
-// ignore_for_file: prefer_const_constructors
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+
+import '../mainfeature/upload.dart';
+import 'history.dart';
+import 'profilescreen.dart';
 
 final supabase = Supabase.instance.client;
 
@@ -15,12 +19,43 @@ class Personalinfo extends StatefulWidget {
 }
 
 class _PersonalinfoState extends State<Personalinfo> {
+  int _selectedIndex = 0;
+
   Map<String, dynamic>? userData;
 
   @override
   void initState() {
     super.initState();
     _fetchUserData();
+  }
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+
+    Widget nextScreen;
+    switch (index) {
+      case 0:
+        nextScreen = Upload_Page();
+        break;
+      case 1:
+        nextScreen = History();
+        break;
+      case 2:
+        nextScreen = ProfileScreen();
+        break;
+      case 3:
+        nextScreen = ProfileScreen(); // تغيير الشاشة الأخيرة إذا لزم الأمر
+        break;
+      default:
+        return;
+    }
+
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => nextScreen),
+    );
   }
 
   Future<void> _fetchUserData() async {
@@ -216,6 +251,44 @@ class _PersonalinfoState extends State<Personalinfo> {
                 ],
               ),
             ),
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: Colors.white,
+
+        currentIndex: _selectedIndex, // تعيين العنصر المحدد
+        onTap: _onItemTapped, // استدعاء التنقل عند الضغط
+        type: BottomNavigationBarType.fixed, // تجنب إعادة ترتيب الأيقونات
+        items: [
+          BottomNavigationBarItem(
+            icon: CircleAvatar(
+              backgroundImage: AssetImage("assets/lip.jpg"),
+              radius: 30,
+            ),
+            label: "",
+          ),
+          BottomNavigationBarItem(
+            icon: CircleAvatar(
+              backgroundImage: AssetImage("assets/lip.jpg"),
+              radius: 30,
+            ),
+            label: "",
+          ),
+          BottomNavigationBarItem(
+            icon: CircleAvatar(
+              backgroundImage: AssetImage("assets/lip.jpg"),
+              radius: 30,
+            ),
+            label: "",
+          ),
+          BottomNavigationBarItem(
+            icon: CircleAvatar(
+              backgroundImage:
+                  AssetImage("assets/lip.jpg"), // تعديل الصورة إذا لزم الأمر
+              radius: 30,
+            ),
+            label: "",
+          ),
+        ],
+      ),
     );
   }
 }
@@ -232,6 +305,8 @@ class EditProfileScreen extends StatefulWidget {
 }
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
+  int _selectedIndex = 0;
+
   File? _image;
   String? _imageUrl; // لتخزين رابط الصورة الحالية
 
@@ -246,6 +321,35 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       _phoneController.text = widget.userData!['phone_number'] ?? '';
       _imageUrl = widget.userData!['avatar_url']; // تحميل الصورة الحالية
     }
+  }
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+
+    Widget nextScreen;
+    switch (index) {
+      case 0:
+        nextScreen = Upload_Page();
+        break;
+      case 1:
+        nextScreen = History();
+        break;
+      case 2:
+        nextScreen = ProfileScreen();
+        break;
+      case 3:
+        nextScreen = ProfileScreen(); // تغيير الشاشة الأخيرة إذا لزم الأمر
+        break;
+      default:
+        return;
+    }
+
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => nextScreen),
+    );
   }
 
   Future<void> _pickImage() async {
@@ -318,33 +422,33 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       body: SingleChildScrollView(
         child: Container(
           color: Colors.white,
-           // ✅ التأكد من أن كل الخلفية بيضاء
+          // ✅ التأكد من أن كل الخلفية بيضاء
           child: Padding(
-                    padding: const EdgeInsets.all(20.0),
+            padding: const EdgeInsets.all(20.0),
             child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start, // محاذاة جميع العناصر لليسار
-            
+              crossAxisAlignment:
+                  CrossAxisAlignment.start, // محاذاة جميع العناصر لليسار
+
               children: [
                 // ✅ الصورة الشخصية مع زر اختيار صورة جديدة
                 Center(
                   child: Stack(
                     alignment: Alignment.center,
                     children: [
-                      
-                         CircleAvatar(
-                          radius: 50,
-                          backgroundImage: _image != null
-                              ? FileImage(_image!) // صورة جديدة من الجهاز
-                              : (_imageUrl != null
-                                  ? NetworkImage(
-                                      '$_imageUrl?timestamp=${DateTime.now().millisecondsSinceEpoch}')
-                                  : null),
-                          child: (_image == null &&
-                                  (_imageUrl == null || _imageUrl!.isEmpty))
-                              ? const Icon(Icons.person, size: 50, color: Colors.grey)
-                              : null,
-                        ),
-                      
+                      CircleAvatar(
+                        radius: 50,
+                        backgroundImage: _image != null
+                            ? FileImage(_image!) // صورة جديدة من الجهاز
+                            : (_imageUrl != null
+                                ? NetworkImage(
+                                    '$_imageUrl?timestamp=${DateTime.now().millisecondsSinceEpoch}')
+                                : null),
+                        child: (_image == null &&
+                                (_imageUrl == null || _imageUrl!.isEmpty))
+                            ? const Icon(Icons.person,
+                                size: 50, color: Colors.grey)
+                            : null,
+                      ),
                       Positioned(
                         bottom: 0,
                         right: 0,
@@ -366,7 +470,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   ),
                 ),
                 const SizedBox(height: 20),
-            
+
                 // ✅ حقل الاسم
                 Text(
                   'Full Name',
@@ -376,7 +480,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     fontFamily: 'Inria Serif',
                     fontWeight: FontWeight.w400,
                   ),
-                  textAlign: TextAlign.left, // إضافة هذه السطر لمحاذاة النص لليسار
+                  textAlign:
+                      TextAlign.left, // إضافة هذه السطر لمحاذاة النص لليسار
                 ),
                 const SizedBox(height: 5),
                 TextField(
@@ -385,7 +490,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     prefixIcon: const Icon(Icons.person_outline),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: Colors.black, width: 2),
+                      borderSide:
+                          const BorderSide(color: Colors.black, width: 2),
                     ),
                     filled: true,
                     fillColor: Colors.white,
@@ -400,8 +506,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     fontFamily: 'Inria Serif',
                     fontWeight: FontWeight.w400,
                   ),
-                    textAlign: TextAlign.left, // محاذاة النص لليسار
-        
+                  textAlign: TextAlign.left, // محاذاة النص لليسار
                 ),
                 const SizedBox(height: 5),
                 TextField(
@@ -410,7 +515,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     prefixIcon: const Icon(Icons.email_outlined),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: Colors.black, width: 2),
+                      borderSide:
+                          const BorderSide(color: Colors.black, width: 2),
                     ),
                     filled: true,
                     fillColor: Colors.white,
@@ -426,8 +532,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     fontFamily: 'Inria Serif',
                     fontWeight: FontWeight.w400,
                   ),
-                    textAlign: TextAlign.left, // محاذاة النص لليسار
-        
+                  textAlign: TextAlign.left, // محاذاة النص لليسار
                 ),
                 const SizedBox(height: 5),
                 TextField(
@@ -436,14 +541,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     prefixIcon: const Icon(Icons.phone_outlined),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: Colors.black, width: 2),
+                      borderSide:
+                          const BorderSide(color: Colors.black, width: 2),
                     ),
                     filled: true,
                     fillColor: Colors.white,
                   ),
                 ),
                 const SizedBox(height: 20),
-            
+
                 // ✅ زر الحفظ مع تدرج الألوان
                 SizedBox(
                   width: double.infinity,
@@ -466,17 +572,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         if (_image != null) {
                           imageUrl = await _uploadImage(_image!);
                         }
-            
+
                         await widget.onUpdate(
                           _fullNameController.text,
                           _phoneController.text,
                           imageUrl,
                         );
-            
+
                         setState(() {
                           _imageUrl = imageUrl;
                         });
-            
+
                         if (mounted) {
                           Navigator.pop(context, imageUrl);
                         }
@@ -505,6 +611,44 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             ),
           ),
         ),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: Colors.white,
+
+        currentIndex: _selectedIndex, // تعيين العنصر المحدد
+        onTap: _onItemTapped, // استدعاء التنقل عند الضغط
+        type: BottomNavigationBarType.fixed, // تجنب إعادة ترتيب الأيقونات
+        items: [
+          BottomNavigationBarItem(
+            icon: CircleAvatar(
+              backgroundImage: AssetImage("assets/lip.jpg"),
+              radius: 30,
+            ),
+            label: "",
+          ),
+          BottomNavigationBarItem(
+            icon: CircleAvatar(
+              backgroundImage: AssetImage("assets/lip.jpg"),
+              radius: 30,
+            ),
+            label: "",
+          ),
+          BottomNavigationBarItem(
+            icon: CircleAvatar(
+              backgroundImage: AssetImage("assets/lip.jpg"),
+              radius: 30,
+            ),
+            label: "",
+          ),
+          BottomNavigationBarItem(
+            icon: CircleAvatar(
+              backgroundImage:
+                  AssetImage("assets/lip.jpg"), // تعديل الصورة إذا لزم الأمر
+              radius: 30,
+            ),
+            label: "",
+          ),
+        ],
       ),
     );
   }
